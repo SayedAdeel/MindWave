@@ -1,21 +1,54 @@
-function generateReply(message){
-  const msg = message.toLowerCase();
-  const hindiWords = ['kya','kaise','ka','hai','aap','mera','ka haal'];
-  const isHindi = hindiWords.some(word => msg.includes(word));
+<script>
+const chat = document.getElementById("chat");
+const input = document.getElementById("input");
+const send = document.getElementById("send");
 
-  if(isHindi){
-    const replies = [
-      "Main thik hoon, aapka kya haal hai?",
-      "Bilkul theek hoon, aap kaise ho?",
-      "Main theek hoon, aap batao!"
-    ];
-    return replies[Math.floor(Math.random() * replies.length)];
-  } else {
-    const replies = [
-      "I'm fine, how are you?",
-      "Doing great! How about you?",
-      "I'm good, what about you?"
-    ];
-    return replies[Math.floor(Math.random() * replies.length)];
-  }
+const API_KEY = "PASTE_YOUR_API_KEY_HERE";
+
+send.onclick = sendMessage;
+input.addEventListener("keypress", e=>{
+    if(e.key==="Enter") sendMessage();
+});
+
+function addMessage(text,type){
+    const msg = document.createElement("div");
+    msg.classList.add("message",type);
+    msg.textContent=text;
+    chat.appendChild(msg);
+    chat.scrollTop=chat.scrollHeight;
 }
+
+async function sendMessage(){
+    const text = input.value.trim();
+    if(!text) return;
+
+    addMessage(text,"user");
+    input.value="";
+
+    addMessage("Thinking...","bot");
+
+    const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`,
+        {
+            method:"POST",
+            headers:{ "Content-Type":"application/json" },
+            body:JSON.stringify({
+                contents:[{
+                    parts:[{ text:text }]
+                }]
+            })
+        }
+    );
+
+    const data = await response.json();
+    
+    chat.removeChild(chat.lastChild);
+
+    if(data.candidates){
+        const reply = data.candidates[0].content.parts[0].text;
+        addMessage(reply,"bot");
+    } else {
+        addMessage("Error getting response 😢","bot");
+    }
+}
+</script>
