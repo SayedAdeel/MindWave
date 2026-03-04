@@ -3,176 +3,228 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MindWave AI – Mini Personality</title>
+<title>MindWave AI – Premium</title>
+
 <style>
-body { font-family: Arial, sans-serif; margin:0; display:flex; justify-content:center; align-items:center; height:100vh; background-color:#f0f4f8; transition: background 0.3s; }
-.chat-container { width:520px; background-color:#fff; border-radius:10px; box-shadow:0 0 20px rgba(0,0,0,0.2); padding:15px; display:flex; flex-direction:column; transition: background 0.3s; }
-.chat-container h2 { text-align:center; margin-bottom:10px; color:#4b4bff; }
-.chat-box { height:520px; overflow-y:auto; border:1px solid #ddd; border-radius:5px; padding:10px; margin-bottom:10px; background-color:#f9f9f9; transition: background 0.3s; }
-.chat-message { margin:5px 0; }
-.user-msg { text-align:right; color:#1a73e8; }
-.bot-msg { text-align:left; color:#34a853; }
-#user-input { padding:10px; border-radius:5px; border:1px solid #ddd; flex:1; }
-#send-btn { padding:10px; margin-top:5px; border:none; background-color:#4b4bff; color:white; border-radius:5px; cursor:pointer; }
-#theme-toggle { margin-bottom:10px; padding:5px 10px; border:none; border-radius:5px; background:#666; color:white; cursor:pointer; align-self:flex-end; }
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+body{
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background: linear-gradient(135deg, #dbeafe, #e0f2fe);
+    transition:0.3s;
+}
+
+.chat-container{
+    width:520px;
+    height:650px;
+    background:white;
+    border-radius:20px;
+    box-shadow:0 20px 40px rgba(0,0,0,0.15);
+    display:flex;
+    flex-direction:column;
+    padding:15px;
+    transition:0.3s;
+}
+
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:10px;
+}
+
+.header h2{
+    font-size:20px;
+    color:#333;
+}
+
+#toggle{
+    padding:6px 12px;
+    border:none;
+    border-radius:20px;
+    background:#111;
+    color:white;
+    cursor:pointer;
+}
+
+.chat-box{
+    flex:1;
+    overflow-y:auto;
+    padding:10px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+.message{
+    max-width:75%;
+    padding:10px 14px;
+    border-radius:18px;
+    font-size:14px;
+    line-height:1.4;
+    word-wrap:break-word;
+    color:black;
+}
+
+.user{
+    align-self:flex-end;
+    background:#e5e7eb;
+    border-bottom-right-radius:5px;
+}
+
+.bot{
+    align-self:flex-start;
+    background:#f3f4f6;
+    border-bottom-left-radius:5px;
+}
+
+.input-area{
+    display:flex;
+    gap:10px;
+    margin-top:10px;
+}
+
+#input{
+    flex:1;
+    padding:10px;
+    border-radius:20px;
+    border:1px solid #ccc;
+    outline:none;
+    color:black;
+}
+
+#send{
+    padding:10px 16px;
+    border:none;
+    border-radius:20px;
+    background:black;
+    color:white;
+    cursor:pointer;
+}
+
+/* Dark Mode */
+.dark{
+    background:linear-gradient(135deg,#111,#1f2937);
+}
+
+.dark .chat-container{
+    background:#1e1e1e;
+}
+
+.dark .message{
+    color:black;
+}
+
+.dark .user{
+    background:#d1d5db;
+}
+
+.dark .bot{
+    background:#e5e7eb;
+}
 </style>
 </head>
+
 <body>
 
 <div class="chat-container">
-  <button id="theme-toggle">Toggle Dark/Light</button>
-  <h2>MindWave 🤖 – Mini Personality</h2>
-  <div class="chat-box" id="chat-box"></div>
-  <input type="text" id="user-input" placeholder="Type your message..." />
-  <button id="send-btn">Send</button>
+    <div class="header">
+        <h2>MindWave 🤖</h2>
+        <button id="toggle">Dark</button>
+    </div>
+
+    <div class="chat-box" id="chat"></div>
+
+    <div class="input-area">
+        <input type="text" id="input" placeholder="Type a message...">
+        <button id="send">Send</button>
+    </div>
 </div>
 
 <script>
-const chatBox = document.getElementById('chat-box');
-const userInput = document.getElementById('user-input');
-const sendBtn = document.getElementById('send-btn');
-const themeToggle = document.getElementById('theme-toggle');
-const chatContainer = document.querySelector('.chat-container');
+const chat = document.getElementById("chat");
+const input = document.getElementById("input");
+const send = document.getElementById("send");
+const toggle = document.getElementById("toggle");
 
-const memory = [];
+let mood = "normal";
 let userName = "";
-let darkMode = false;
-let lastTopic = null;
-let mood = "friendly";
 
-const funFacts = [
-  "Honey never spoils 🍯",
-  "Bananas are berries, but strawberries aren't 🍌🍓",
-  "Octopuses have three hearts 🐙",
-  "A group of flamingos is called a 'flamboyance' 🦩",
-  "Water can boil and freeze at the same time under certain conditions 💧"
-];
+toggle.onclick = () => {
+    document.body.classList.toggle("dark");
+};
 
-const quizQuestions = [
-  {q:"What is 5 + 7?", a:"12"},
-  {q:"Capital of France?", a:"Paris"},
-  {q:"2 * 6 = ?", a:"12"},
-  {q:"Water freezes at ___ °C?", a:"0"}
-];
-
-// Theme toggle
-themeToggle.addEventListener('click', () => {
-  darkMode = !darkMode;
-  document.body.style.backgroundColor = darkMode ? '#121212' : '#f0f4f8';
-  chatContainer.style.backgroundColor = darkMode ? '#1e1e1e' : '#fff';
-  document.querySelector('.chat-box').style.backgroundColor = darkMode ? '#2a2a2a' : '#f9f9f9';
+send.onclick = sendMessage;
+input.addEventListener("keypress", e=>{
+    if(e.key==="Enter") sendMessage();
 });
 
-sendBtn.addEventListener('click', handleSend);
-userInput.addEventListener('keypress', e => { if(e.key==='Enter') handleSend(); });
+function sendMessage(){
+    const text = input.value.trim();
+    if(!text) return;
 
-function handleSend(){
-  const message = userInput.value.trim();
-  if(!message) return;
-  addMessage('user', message);
-  memory.push({role:'user', content:message});
-  if(memory.length>40) memory.shift();
-  userInput.value = '';
-  setTimeout(()=>{
-    const reply = generateReply(message);
-    addMessage('bot', reply);
-    memory.push({role:'bot', content:reply});
-  },200);
+    addMessage(text,"user");
+    input.value="";
+
+    setTimeout(()=>{
+        const reply = generateReply(text);
+        addMessage(reply,"bot");
+    },400);
 }
 
-function addMessage(sender,message){
-  const msgDiv = document.createElement('div');
-  msgDiv.classList.add('chat-message',sender==='user'?'user-msg':'bot-msg');
-  msgDiv.textContent = message;
-  chatBox.appendChild(msgDiv);
-  chatBox.scrollTop = chatBox.scrollHeight;
+function addMessage(text,type){
+    const msg = document.createElement("div");
+    msg.classList.add("message",type);
+    msg.textContent=text;
+    chat.appendChild(msg);
+    chat.scrollTop=chat.scrollHeight;
 }
 
 function generateReply(message){
-  const msg = message.toLowerCase();
-  const hindiWords = ['kya','kaise','ka','hai','aap','mera','ka haal','namaste','mazak','joke','naam','fact','quiz'];
-  const isHindi = hindiWords.some(word => msg.includes(word));
+    const msg = message.toLowerCase();
 
-  // Detect user name
-  if(msg.includes('mera naam')) {
-    const parts = msg.split('mera naam');
-    if(parts[1]) {
-      userName = parts[1].trim().split(' ')[0];
-      return isHindi ? `Acha, aapka naam ${userName} hai! 😄` : `Okay, your name is ${userName}! 😄`;
+    if(msg.includes("your name") || msg.includes("apka naam")){
+        return "My name is MindWave 🤖";
     }
-  }
 
-  // AI name reply
-  if(msg.includes('apka naam') || msg.includes('your name')){
-    return isHindi ? "Mera name MindWave hai! 🤖" : "My name is MindWave! 🤖";
-  }
-
-  // Fun facts
-  if(msg.includes('fun fact')){
-    lastTopic = "fun fact";
-    return funFacts[Math.floor(Math.random()*funFacts.length)];
-  }
-
-  // Quiz
-  if(msg.includes('quiz')){
-    lastTopic = "quiz";
-    const q = quizQuestions[Math.floor(Math.random()*quizQuestions.length)];
-    return `Quiz: ${q.q} (Answer: ${q.a})`;
-  }
-
-  // Mood change
-  if(msg.includes('happy') || msg.includes('excited')) mood = "excited";
-  if(msg.includes('sad') || msg.includes('tired')) mood = "serious";
-
-  // Topic follow-up logic
-  let replies = [];
-  const lastBot = memory.slice().reverse().find(m=>m.role==='bot');
-  const lastBotMsg = lastBot ? lastBot.content : "";
-
-  if(isHindi){
-    if(msg.includes('kya haal') || msg.includes('kaise ho')){
-      replies = mood==="excited" ? ["Main bahut excited hoon! 😄 Aap kaise ho?","Yay! Main theek hoon, aap batao! 😎"] : ["Main thik hoon, aapka kya haal hai? 🙂","Bilkul theek hoon, aap kaise ho? 😄"];
-      if(userName) replies.push(`${userName}, aap kaise ho? 😎`);
-      lastTopic="how are you";
-    } else if(msg.includes('namaste') || msg.includes('hello')) {
-      replies = ["Namaste! Kaise ho? 🙏","Hello! Kaise ho? 🙂"];
-      lastTopic="greeting";
-    } else if(msg.includes('mazak') || msg.includes('joke')){
-      replies = ["Ek chota sa joke: Teacher: 2+2 kya hota? Student: 4! 😆","Mazakiya baat: Main AI hoon, par joke kar sakta hoon! 😂"];
-      lastTopic="joke";
-    } else if(msg.includes('math') || msg.includes('addition')){
-      replies = ["1+1=2 😎","5+7=12 😉"];
-      lastTopic="math";
-    } else {
-      replies = ["Main theek hoon, aap batao! 😄","Sab badhiya! 😎"];
+    if(msg.includes("mera naam")){
+        userName = message.split("mera naam")[1]?.trim();
+        return "Nice to meet you 😄";
     }
-  } else {
-    if(msg.includes('how are you')){
-      replies = mood==="excited" ? ["I'm feeling super excited! 😄 How are you?","Yay! I'm good, tell me about you! 😎"] : ["I'm fine, how are you? 🙂","Doing great! How about you? 😄"];
-      if(userName) replies.push(`Hey ${userName}, how are you? 😊`);
-      lastTopic="how are you";
-    } else if(msg.includes('hello') || msg.includes('hi')){
-      replies = ["Hello! How can I help you? 😄","Hi! How's it going? 🙂"];
-      lastTopic="greeting";
-    } else if(msg.includes('joke')){
-      replies = ["Why did the computer go to the doctor? It caught a virus! 😂","I love coding jokes! 😆"];
-      lastTopic="joke";
-    } else if(msg.includes('math') || msg.includes('addition')){
-      replies = ["1+1=2 😎","7+8=15 😉"];
-      lastTopic="math";
-    } else {
-      replies = ["I am fine, tell me about you! 😎","All good here! 🙂"];
+
+    if(msg.includes("how are you")){
+        return mood==="happy" ? 
+        "I'm feeling amazing today! 😄 How about you?" :
+        "I'm fine 🙂 What about you?";
     }
-  }
 
-  // Topic follow-up: if same as last topic, add playful comment
-  if(lastTopic && memory.length>2 && memory[memory.length-2].role==='bot'){
-    const prev = memory[memory.length-2].content.toLowerCase();
-    if(prev.includes(lastTopic)) replies.push(mood==="excited"?"Haha, you are repeating! 😆":"Yes, I remember we were talking about this! 😄");
-  }
+    if(msg.includes("kya haal") || msg.includes("kaise ho")){
+        return "Main theek hoon 😎 Aap batao?";
+    }
 
-  const options = replies.filter(r=>r!==lastBotMsg);
-  return options[Math.floor(Math.random()*options.length)];
+    if(msg.includes("joke")){
+        return "Why don’t programmers like nature? It has too many bugs 😂";
+    }
+
+    if(msg.includes("happy")) mood="happy";
+
+    const replies=[
+        "That's interesting 😄",
+        "Tell me more about that.",
+        "Hmm 🤔 I see.",
+        "Nice! 😊",
+        "Sounds good!"
+    ];
+
+    return replies[Math.floor(Math.random()*replies.length)];
 }
 </script>
 
