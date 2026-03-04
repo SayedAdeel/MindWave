@@ -1,29 +1,40 @@
+// -------------------------
+// MindWave Script JS
+// -------------------------
+
 const chatBox = document.getElementById('chat-box');
 const userInput = document.getElementById('user-input');
 const sendBtn = document.getElementById('send-btn');
 
-// ✅ Apni OpenAI API key yahan paste karo
-const OPENAI_API_KEY = "YOUR_OPENAI_API_KEY"; // <-- Replace this with your API key
+// -------------------------
+// Config
+// -------------------------
+const OPENAI_API_KEY = "YOUR_OPENAI_API_KEY"; // <-- Replace with your key
 
-// Event listeners
-sendBtn.addEventListener('click', sendMessage);
-userInput.addEventListener('keypress', function(e) {
-  if (e.key === 'Enter') sendMessage();
-});
+// -------------------------
+// Event Listeners
+// -------------------------
+sendBtn.addEventListener('click', handleSend);
+userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleSend(); });
 
-// Send message function
-async function sendMessage() {
+// -------------------------
+// Functions
+// -------------------------
+
+// Handle send button or Enter press
+async function handleSend() {
   const message = userInput.value.trim();
-  if (message === '') return;
+  if (!message) return;
 
-  addMessage('user', message); // Show user message
+  addMessage('user', message);
   userInput.value = '';
 
-  const reply = await getAIResponse(message); // Call OpenAI API
-  addMessage('bot', reply); // Show AI response
+  // Call AI response
+  const reply = await getAIResponse(message);
+  addMessage('bot', reply);
 }
 
-// Function to display messages
+// Display message in chat box
 function addMessage(sender, message) {
   const msgDiv = document.createElement('div');
   msgDiv.classList.add('chat-message', sender === 'user' ? 'user-msg' : 'bot-msg');
@@ -32,7 +43,9 @@ function addMessage(sender, message) {
   chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-// Function to call OpenAI API
+// -------------------------
+// AI Response
+// -------------------------
 async function getAIResponse(message) {
   try {
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -52,8 +65,9 @@ async function getAIResponse(message) {
 
     const data = await response.json();
     return data.choices[0].message.content.trim();
+
   } catch (error) {
-    console.error(error);
+    console.error("AI Response Error:", error);
     return "Sorry, MindWave is having trouble replying right now.";
   }
 }
