@@ -1,63 +1,31 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-const API_KEY = "AIzaSyAPocUTPwrTxI1r6ynY96-KpGJhhFwc-Xo; // 👈 YAHAN APNI API KEY DALO
+    const sendBtn = document.getElementById("send");
+    const input = document.getElementById("input");
+    const chat = document.getElementById("chat");
 
-const chat = document.getElementById("chat");
-const input = document.getElementById("input");
-const send = document.getElementById("send");
+    sendBtn.addEventListener("click", function () {
 
-function addMessage(text, type) {
-    const msg = document.createElement("div");
-    msg.classList.add("message", type);
-    msg.textContent = text;
-    chat.appendChild(msg);
-    chat.scrollTop = chat.scrollHeight;
-}
+        const message = input.value.trim();
 
-async function sendMessage() {
-    const text = input.value.trim();
-    if (!text) return;
+        if (message === "") return;
 
-    addMessage(text, "user");
-    input.value = "";
-    addMessage("Thinking...", "bot");
+        // User message
+        const userMsg = document.createElement("div");
+        userMsg.textContent = "You: " + message;
+        userMsg.style.margin = "10px 0";
+        chat.appendChild(userMsg);
 
-    try {
-        const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`,
-            {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    contents: [{
-                        parts: [{ text: text }]
-                    }]
-                })
-            }
-        );
+        // Bot reply
+        const botMsg = document.createElement("div");
+        botMsg.textContent = "Bot: I received your message!";
+        botMsg.style.margin = "10px 0";
+        botMsg.style.color = "#2563eb";
+        chat.appendChild(botMsg);
 
-        const data = await response.json();
-        chat.removeChild(chat.lastChild);
+        input.value = "";
+        chat.scrollTop = chat.scrollHeight;
 
-        if (data.candidates && data.candidates.length > 0) {
-            const reply = data.candidates[0].content.parts[0].text;
-            addMessage(reply, "bot");
-        } else {
-            addMessage("No response from AI 😢", "bot");
-        }
-
-    } catch (error) {
-        chat.removeChild(chat.lastChild);
-        addMessage("API Error 😢 Check your key or billing.", "bot");
-    }
-}
-
-send.addEventListener("click", sendMessage);
-
-input.addEventListener("keypress", function (e) {
-    if (e.key === "Enter") {
-        sendMessage();
-    }
-});
+    });
 
 });
