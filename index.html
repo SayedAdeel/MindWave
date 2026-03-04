@@ -1,98 +1,126 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>MindWave AI</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MindWave Study AI</title>
 
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #0f172a;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
+<style>
+body { margin:0; font-family:Arial; transition:0.3s; }
+.dark { background:#0f172a; color:white; }
+.light { background:#f1f5f9; color:black; }
 
-        .chat-container {
-            width: 400px;
-            height: 600px;
-            background: #1e293b;
-            border-radius: 15px;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
-        }
+.container { width:420px; margin:20px auto; }
 
-        .chat-header {
-            background: #2563eb;
-            color: white;
-            padding: 15px;
-            text-align: center;
-            font-size: 18px;
-            font-weight: bold;
-        }
+.box {
+    background:white;
+    padding:20px;
+    border-radius:10px;
+    box-shadow:0 0 15px rgba(0,0,0,0.2);
+}
 
-        #chat-box {
-            flex: 1;
-            padding: 15px;
-            overflow-y: auto;
-            color: white;
-            font-size: 14px;
-        }
+input { width:100%; padding:8px; margin:5px 0; border-radius:5px; border:1px solid #ccc; }
 
-        .message {
-            margin-bottom: 10px;
-        }
+button {
+    padding:8px;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+    margin-top:5px;
+}
 
-        .input-area {
-            display: flex;
-            padding: 10px;
-            background: #0f172a;
-        }
+.primary { background:#2563eb; color:white; width:100%; }
 
-        #user-input {
-            flex: 1;
-            padding: 10px;
-            border-radius: 8px;
-            border: none;
-            outline: none;
-        }
+.chat-container {
+    height:600px;
+    display:flex;
+    flex-direction:column;
+    border-radius:15px;
+    overflow:hidden;
+    box-shadow:0 0 20px rgba(0,0,0,0.3);
+}
 
-        #send-btn {
-            margin-left: 10px;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 8px;
-            background: #2563eb;
-            color: white;
-            cursor: pointer;
-        }
+.header {
+    padding:15px;
+    text-align:center;
+    background:#2563eb;
+    color:white;
+    position:relative;
+}
 
-        #send-btn:hover {
-            background: #1d4ed8;
-        }
-    </style>
+.logout-btn {
+    position:absolute;
+    left:10px;
+    top:10px;
+    background:red;
+    color:white;
+}
+
+.toggle-btn {
+    position:absolute;
+    right:10px;
+    top:10px;
+}
+
+#chat-box { flex:1; padding:10px; overflow-y:auto; }
+
+.message { margin:8px 0; padding:10px; border-radius:10px; max-width:75%; }
+.user { background:#2563eb; color:white; margin-left:auto; }
+.ai { background:#e2e8f0; color:black; }
+
+.input-area { display:flex; padding:10px; }
+
+.ad-space {
+    height:80px;
+    background:#ddd;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin-bottom:10px;
+}
+</style>
 </head>
-<body>
 
-    <div class="chat-container">
-        <div class="chat-header">
-            MindWave AI 🤖
-        </div>
+<body class="dark">
 
-        <div id="chat-box"></div>
+<div class="container">
 
-        <div class="input-area">
-            <input type="text" id="user-input" placeholder="Type your message...">
-            <button id="send-btn">Send</button>
-        </div>
-    </div>
+<!-- LOGIN / SIGNUP -->
+<div id="auth-box" class="box">
+<h2>MindWave Login</h2>
+<input type="text" id="username" placeholder="Username">
+<input type="password" id="password" placeholder="Password">
+<button class="primary" onclick="signup()">Sign Up</button>
+<button class="primary" onclick="login()">Login</button>
+</div>
 
-    <script src="script.js"></script>
+<!-- CHAT SYSTEM -->
+<div id="chat-system" style="display:none;">
 
+<div class="ad-space">
+Google Ads Space (Approval ke baad ads dikhenge)
+</div>
+
+<div class="chat-container">
+<div class="header">
+<button class="logout-btn" onclick="logout()">Logout</button>
+<span id="welcome-user"></span>
+<button class="toggle-btn" onclick="toggleMode()">🌙</button>
+</div>
+
+<div id="chat-box"></div>
+
+<div class="input-area">
+<input type="text" id="user-input" placeholder="Type message...">
+<button onclick="sendMessage()">Send</button>
+<button onclick="startVoice()">🎤</button>
+</div>
+
+</div>
+</div>
+
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
