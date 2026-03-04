@@ -6,30 +6,28 @@
 <title>MindWave Study AI</title>
 
 <style>
-body { margin:0; font-family:Arial; transition:0.3s; }
+body {
+    margin:0;
+    font-family:Arial;
+    transition:0.3s;
+}
 .dark { background:#0f172a; color:white; }
 .light { background:#f1f5f9; color:black; }
 
-.container { width:420px; margin:20px auto; }
-
-.box {
-    background:white;
-    padding:20px;
-    border-radius:10px;
-    box-shadow:0 0 15px rgba(0,0,0,0.2);
+.wrapper {
+    width:420px;
+    margin:20px auto;
 }
 
-input { width:100%; padding:8px; margin:5px 0; border-radius:5px; border:1px solid #ccc; }
-
-button {
-    padding:8px;
-    border:none;
-    border-radius:5px;
-    cursor:pointer;
-    margin-top:5px;
+.ad-space {
+    height:80px;
+    background:#ddd;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin-bottom:10px;
+    font-weight:bold;
 }
-
-.primary { background:#2563eb; color:white; width:100%; }
 
 .chat-container {
     height:600px;
@@ -48,77 +46,86 @@ button {
     position:relative;
 }
 
-.logout-btn {
-    position:absolute;
-    left:10px;
-    top:10px;
-    background:red;
-    color:white;
-}
-
 .toggle-btn {
     position:absolute;
     right:10px;
     top:10px;
+    border:none;
+    padding:5px;
+    border-radius:5px;
+    cursor:pointer;
 }
 
-#chat-box { flex:1; padding:10px; overflow-y:auto; }
+#chat-box {
+    flex:1;
+    padding:10px;
+    overflow-y:auto;
+}
 
-.message { margin:8px 0; padding:10px; border-radius:10px; max-width:75%; }
-.user { background:#2563eb; color:white; margin-left:auto; }
-.ai { background:#e2e8f0; color:black; }
+.message {
+    margin:8px 0;
+    padding:10px;
+    border-radius:10px;
+    max-width:75%;
+}
 
-.input-area { display:flex; padding:10px; }
+.user {
+    background:#2563eb;
+    color:white;
+    margin-left:auto;
+}
 
-.ad-space {
-    height:80px;
-    background:#ddd;
+.ai {
+    background:#e2e8f0;
+    color:black;
+}
+
+.input-area {
     display:flex;
-    align-items:center;
-    justify-content:center;
-    margin-bottom:10px;
+    padding:10px;
+}
+
+input {
+    flex:1;
+    padding:8px;
+    border-radius:5px;
+    border:1px solid #ccc;
+}
+
+button {
+    margin-left:5px;
+    padding:8px;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
 }
 </style>
 </head>
 
 <body class="dark">
 
-<div class="container">
-
-<!-- LOGIN / SIGNUP -->
-<div id="auth-box" class="box">
-<h2>MindWave Login</h2>
-<input type="text" id="username" placeholder="Username">
-<input type="password" id="password" placeholder="Password">
-<button class="primary" onclick="signup()">Sign Up</button>
-<button class="primary" onclick="login()">Login</button>
-</div>
-
-<!-- CHAT SYSTEM -->
-<div id="chat-system" style="display:none;">
+<div class="wrapper">
 
 <div class="ad-space">
 Google Ads Space (Approval ke baad ads dikhenge)
 </div>
 
 <div class="chat-container">
+
 <div class="header">
-<button class="logout-btn" onclick="logout()">Logout</button>
-<span id="welcome-user"></span>
+MindWave Study AI 🤖
 <button class="toggle-btn" onclick="toggleMode()">🌙</button>
 </div>
 
 <div id="chat-box"></div>
 
 <div class="input-area">
-<input type="text" id="user-input" placeholder="Type message...">
+<input type="text" id="user-input" placeholder="Type your message...">
 <button onclick="sendMessage()">Send</button>
 <button onclick="startVoice()">🎤</button>
 </div>
 
 </div>
-</div>
-
 </div>
 
 <script src="script.js"></script>
