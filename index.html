@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MindWave AI (Local, Smarter)</title>
+<title>MindWave AI – Full Local</title>
 <style>
 body { font-family: Arial, sans-serif; background-color:#f0f4f8; display:flex; justify-content:center; align-items:center; height:100vh; margin:0; }
 .chat-container { width:400px; background-color:#fff; border-radius:10px; box-shadow:0 0 15px rgba(0,0,0,0.1); padding:15px; display:flex; flex-direction:column; }
@@ -19,7 +19,7 @@ body { font-family: Arial, sans-serif; background-color:#f0f4f8; display:flex; j
 <body>
 
 <div class="chat-container">
-  <h2>MindWave 🤖 (Local, Smarter)</h2>
+  <h2>MindWave 🤖 – Full Local</h2>
   <div class="chat-box" id="chat-box"></div>
   <input type="text" id="user-input" placeholder="Type your message..." />
   <button id="send-btn">Send</button>
@@ -30,9 +30,11 @@ const chatBox = document.getElementById('chat-box');
 const userInput = document.getElementById('user-input');
 const sendBtn = document.getElementById('send-btn');
 
-// Simple context memory array
+// Context memory (last 5 messages)
 const memory = [];
+let userName = "";
 
+// Event listeners
 sendBtn.addEventListener('click', handleSend);
 userInput.addEventListener('keypress', e => { if(e.key==='Enter') handleSend(); });
 
@@ -46,6 +48,7 @@ function handleSend(){
     const reply = generateReply(message);
     addMessage('bot', reply);
     memory.push({role:'bot', content:reply});
+    if(memory.length>10) memory.shift(); // keep last 10 messages
   }, 200);
 }
 
@@ -57,26 +60,35 @@ function addMessage(sender, message){
   chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-// Smarter local AI reply generator with context memory
+// Smarter local AI with context and user name
 function generateReply(message){
   const msg = message.toLowerCase();
   const hindiWords = ['kya','kaise','ka','hai','aap','mera','ka haal','namaste'];
   const isHindi = hindiWords.some(word => msg.includes(word));
 
-  // Context-aware reply: check last bot message
-  const lastBot = memory.slice().reverse().find(m => m.role==='bot');
+  // Detect user name
+  if(msg.includes('mera naam')) {
+    const parts = msg.split('mera naam');
+    if(parts[1]) {
+      userName = parts[1].trim().split(' ')[0];
+      return isHindi ? `Acha, aapka naam ${userName} hai!` : `Okay, your name is ${userName}!`;
+    }
+  }
+
+  // Context-aware replies (avoid repeating last bot message)
+  const lastBot = memory.slice().reverse().find(m=>m.role==='bot');
   const lastBotMsg = lastBot ? lastBot.content : "";
 
   if(isHindi){
     const replies = [
-      "Main thik hoon, aapka kya haal hai?",
-      "Bilkul theek hoon, aap kaise ho?",
-      "Main theek hoon, aap batao!",
-      "Shukriya! Aap kaise ho?",
-      "Main badhiya hoon, aap kaise ho?"
+      `Main thik hoon, aapka kya haal hai?`,
+      `Bilkul theek hoon, aap kaise ho?`,
+      `Main theek hoon, aap batao!`,
+      `Shukriya! Aap kaise ho?`,
+      `Main badhiya hoon, aap kaise ho?`
     ];
-    // Avoid repeating last reply exactly
-    const options = replies.filter(r => r !== lastBotMsg);
+    if(userName) replies.push(`${userName}, aap kaise ho?`);
+    const options = replies.filter(r=>r!==lastBotMsg);
     return options[Math.floor(Math.random()*options.length)];
   } else {
     const replies = [
@@ -86,7 +98,8 @@ function generateReply(message){
       "All good here! How's your day?",
       "I'm doing well, and you?"
     ];
-    const options = replies.filter(r => r !== lastBotMsg);
+    if(userName) replies.push(`Hey ${userName}, how are you?`);
+    const options = replies.filter(r=>r!==lastBotMsg);
     return options[Math.floor(Math.random()*options.length)];
   }
 }
