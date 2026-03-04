@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MindWave AI (Local)</title>
+<title>MindWave AI (Local, Smarter)</title>
 <style>
 body { font-family: Arial, sans-serif; background-color:#f0f4f8; display:flex; justify-content:center; align-items:center; height:100vh; margin:0; }
 .chat-container { width:400px; background-color:#fff; border-radius:10px; box-shadow:0 0 15px rgba(0,0,0,0.1); padding:15px; display:flex; flex-direction:column; }
@@ -19,7 +19,7 @@ body { font-family: Arial, sans-serif; background-color:#f0f4f8; display:flex; j
 <body>
 
 <div class="chat-container">
-  <h2>MindWave 🤖 (Local)</h2>
+  <h2>MindWave 🤖 (Local, Smarter)</h2>
   <div class="chat-box" id="chat-box"></div>
   <input type="text" id="user-input" placeholder="Type your message..." />
   <button id="send-btn">Send</button>
@@ -30,6 +30,9 @@ const chatBox = document.getElementById('chat-box');
 const userInput = document.getElementById('user-input');
 const sendBtn = document.getElementById('send-btn');
 
+// Simple context memory array
+const memory = [];
+
 sendBtn.addEventListener('click', handleSend);
 userInput.addEventListener('keypress', e => { if(e.key==='Enter') handleSend(); });
 
@@ -37,8 +40,13 @@ function handleSend(){
   const message = userInput.value.trim();
   if(!message) return;
   addMessage('user', message);
+  memory.push({role:'user', content:message});
   userInput.value = '';
-  setTimeout(()=>{ addMessage('bot', generateReply(message)); }, 200);
+  setTimeout(()=>{
+    const reply = generateReply(message);
+    addMessage('bot', reply);
+    memory.push({role:'bot', content:reply});
+  }, 200);
 }
 
 function addMessage(sender, message){
@@ -49,11 +57,15 @@ function addMessage(sender, message){
   chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-// Smarter fake AI reply generator
+// Smarter local AI reply generator with context memory
 function generateReply(message){
   const msg = message.toLowerCase();
   const hindiWords = ['kya','kaise','ka','hai','aap','mera','ka haal','namaste'];
   const isHindi = hindiWords.some(word => msg.includes(word));
+
+  // Context-aware reply: check last bot message
+  const lastBot = memory.slice().reverse().find(m => m.role==='bot');
+  const lastBotMsg = lastBot ? lastBot.content : "";
 
   if(isHindi){
     const replies = [
@@ -63,7 +75,9 @@ function generateReply(message){
       "Shukriya! Aap kaise ho?",
       "Main badhiya hoon, aap kaise ho?"
     ];
-    return replies[Math.floor(Math.random() * replies.length)];
+    // Avoid repeating last reply exactly
+    const options = replies.filter(r => r !== lastBotMsg);
+    return options[Math.floor(Math.random()*options.length)];
   } else {
     const replies = [
       "I'm fine, how are you?",
@@ -72,7 +86,8 @@ function generateReply(message){
       "All good here! How's your day?",
       "I'm doing well, and you?"
     ];
-    return replies[Math.floor(Math.random() * replies.length)];
+    const options = replies.filter(r => r !== lastBotMsg);
+    return options[Math.floor(Math.random()*options.length)];
   }
 }
 </script>
