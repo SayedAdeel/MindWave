@@ -1,31 +1,52 @@
-document.addEventListener("DOMContentLoaded", function () {
+const sendBtn = document.getElementById("send-btn");
+const userInput = document.getElementById("user-input");
+const chatBox = document.getElementById("chat-box");
 
-    const sendBtn = document.getElementById("send");
-    const input = document.getElementById("input");
-    const chat = document.getElementById("chat");
+sendBtn.addEventListener("click", sendMessage);
 
-    sendBtn.addEventListener("click", function () {
+function sendMessage() {
+    const message = userInput.value.trim();
+    if (message === "") return;
 
-        const message = input.value.trim();
+    addMessage("You", message);
+    userInput.value = "";
 
-        if (message === "") return;
+    setTimeout(() => {
+        const reply = getBotReply(message);
+        addMessage("Bot", reply);
+    }, 500);
+}
 
-        // User message
-        const userMsg = document.createElement("div");
-        userMsg.textContent = "You: " + message;
-        userMsg.style.margin = "10px 0";
-        chat.appendChild(userMsg);
+function addMessage(sender, text) {
+    const messageDiv = document.createElement("div");
+    messageDiv.classList.add("message");
+    messageDiv.innerHTML = `<strong>${sender}:</strong> ${text}`;
+    chatBox.appendChild(messageDiv);
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
 
-        // Bot reply
-        const botMsg = document.createElement("div");
-        botMsg.textContent = "Bot: I received your message!";
-        botMsg.style.margin = "10px 0";
-        botMsg.style.color = "#2563eb";
-        chat.appendChild(botMsg);
+function getBotReply(message) {
+    message = message.toLowerCase();
 
-        input.value = "";
-        chat.scrollTop = chat.scrollHeight;
+    if (message.includes("hello") || message.includes("hi")) {
+        return "Hello Adil 👋 How can I help you?";
+    }
 
-    });
+    if (message.includes("math")) {
+        return "Math is important! Which chapter do you need help with?";
+    }
 
-});
+    if (message.includes("science")) {
+        return "Science is amazing 🔬 What topic?";
+    }
+
+    if (message.includes("who made you")) {
+        return "I was created by Adil 😎";
+    }
+
+    if (message.includes("bye")) {
+        return "Goodbye! Come back soon 👋";
+    }
+
+    return "I am still learning 🤖 Please ask something about studies.";
+}
