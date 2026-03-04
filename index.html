@@ -49,25 +49,30 @@ function addMessage(sender, message){
   chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-// Simple English/Hindi reply generator
+// Smarter fake AI reply generator
 function generateReply(message){
   const msg = message.toLowerCase();
-  const hindiWords = ['kya','kaise','ka','hai','aap','mera','ka haal'];
+  const hindiWords = ['kya','kaise','ka','hai','aap','mera','ka haal','namaste'];
   const isHindi = hindiWords.some(word => msg.includes(word));
 
-  // Hindi replies
   if(isHindi){
-    if(msg.includes('kya haal') || msg.includes('ka haal')) return "Main thik hoon, aapka kya haal hai?";
-    if(msg.includes('kaise ho')) return "Main bilkul thik hoon, aap kaise ho?";
-    if(msg.includes('namaste') || msg.includes('hello')) return "Namaste! Aap kaise ho?";
-    return "Main theek hoon, aap batao!";
-  } 
-  // English replies
-  else {
-    if(msg.includes('how are you')) return "I'm fine, how are you?";
-    if(msg.includes('hello') || msg.includes('hi')) return "Hello! How can I help you?";
-    if(msg.includes('what is your name')) return "My name is MindWave 🤖";
-    return "I am fine, tell me about you!";
+    const replies = [
+      "Main thik hoon, aapka kya haal hai?",
+      "Bilkul theek hoon, aap kaise ho?",
+      "Main theek hoon, aap batao!",
+      "Shukriya! Aap kaise ho?",
+      "Main badhiya hoon, aap kaise ho?"
+    ];
+    return replies[Math.floor(Math.random() * replies.length)];
+  } else {
+    const replies = [
+      "I'm fine, how are you?",
+      "Doing great! How about you?",
+      "I'm good, what about you?",
+      "All good here! How's your day?",
+      "I'm doing well, and you?"
+    ];
+    return replies[Math.floor(Math.random() * replies.length)];
   }
 }
 </script>
